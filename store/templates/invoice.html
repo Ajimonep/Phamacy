@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Order #{{ order.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .order-items {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .order-items th, .order-items td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .total-amount {
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="invoice-header">
+        <h1>Invoice for Order #{{ order.id }}</h1>
+        <p><strong>Customer:</strong> {{ order.customer.username }}</p>
+        <p><strong>Customer Mobile No:</strong> {{ order.phone }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Order Date:</strong> {{ order.created_date }}</p>
+        
+
+    </div>
+
+    <h3>Order Items</h3>
+    <table class="order-items">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+            <tr>
+                <td>{{ item.product_object.title}}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price }}</td>
+                <td>₹{{ item.item_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="total-amount">Total Amount: ₹{{ order.order_total}}</p>
+</div>
+
+</body>
+</html>
