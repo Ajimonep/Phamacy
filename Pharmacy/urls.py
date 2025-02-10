@@ -24,7 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("signup/",views.SignUpView.as_view(),name="signup"),
     path("verify/otp/",views.VerifyEmailView.as_view(),name="verify-email"),
-    path("signin/",views.SignInView.as_view(),name="signin"),
+    path("signout/",views.SignOutView.as_view(),name="signout"),
+    path("",views.SignInView.as_view(),name="signin"),
     path("index/",views.ProductListView.as_view(),name="product-list"),
     path('product/<int:pk>/',views.productDetailView.as_view(),name="product-detail"),
     path('products/<int:pk>/cart/add/',views.AddToCartView.as_view(),name="addtocart"),
@@ -33,8 +34,8 @@ urlpatterns = [
     path('order',views.PlaceOrderView.as_view(),name="placeorder"),
     path('order/summary/',views.OrderSummaryView.as_view(),name="order-summary"),
     path('payment/verify/',views.PaymentVerificationView.as_view(),name="payment-verify"),
-    path('order-status/<int:order_id>/',views.OrderStatusView.as_view(), name='order-status'),
     path('download invoice/<int:order_id>/',views.InvoiceDownloadView.as_view(), name='download-invoice'),
+    path('submit-review/<int:pk>/',views.SubmitReviewView.as_view(),name='submit_review'),
 
 
 

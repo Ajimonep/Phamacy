@@ -33,12 +33,7 @@ class MedicineType(BaseModel):
     def __str__(self):
         return self.MedicineType
 
-class Unit_type(BaseModel):  
 
-    unit=models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.unit
 
 class Size(BaseModel):
 
@@ -60,7 +55,6 @@ class Product(BaseModel):
 
     medicinetype_object=models.ForeignKey(MedicineType,on_delete=models.CASCADE)
 
-    unit_object=models.ForeignKey(Unit_type,on_delete=models.CASCADE,related_name="units")
 
     size_objects=models.ManyToManyField(Size,related_name="sizes")
     
@@ -86,7 +80,6 @@ class BasketItem(BaseModel):
 
     size_object=models.ForeignKey(Size,on_delete=models.CASCADE,null=True)
 
-    unit_object=models.ForeignKey(Unit_type,on_delete=models.CASCADE,null=True)
 
     is_order_placed=models.BooleanField(default=False)
 
@@ -136,6 +129,7 @@ class Order(BaseModel):
         return total
 
 
+
 class OrderItem(BaseModel):
 
     order_object=models.ForeignKey(
@@ -147,9 +141,7 @@ class OrderItem(BaseModel):
 
     quantity=models.PositiveIntegerField(default=1)
 
-    # size_object=models.ForeignKey(Size,on_delete=models.CASCADE)
-
-    # unit_object=models.ForeignKey(Unit_type,on_delete=models.CASCADE)
+    size_object=models.ForeignKey(Size,on_delete=models.CASCADE,null=True)
 
     price=models.FloatField()
 
@@ -168,5 +160,25 @@ def create_basket(sender,instance,created,**kwargs):
 post_save.connect(create_basket,User)
 
 
+class ReviewRating(models.Model):
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    subject = models.CharField(max_length=100, blank=True)
+
+    review = models.TextField(max_length=500, blank=True)
+
+    rating = models.FloatField()
+
+    status = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.subject
 
 

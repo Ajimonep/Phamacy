@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <!-- Tailwind cdn -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"><body>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<!-- navbar start -->
-    <!-- <header class="bg-white my-3">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- Tailwind cdn -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<body>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- navbar start -->
+  <!-- <header class="bg-white my-3">
         <div class="mx-auto flex h-16 max-w-screen-xl items-center gap-8 px-4 sm:px-6 lg:px-8">
           <a class="block text-teal-600" href="#">
             <span class="sr-only">Home</span>
@@ -89,72 +93,94 @@
           </div>
         </div>
       </header> -->
-<!-- nav bar end -->
+  <!-- nav bar end -->
 
-<nav class="bg-white border-gray-200 py-2.5 dark:bg-gray-900">
-  <div class="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
+  <nav class="bg-white border-gray-200 py-2.5 dark:bg-gray-900">
+    <div class="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
       <a href="#" class="flex items-center">
-          <img src="https://www.svgrepo.com/show/499962/music.svg" class="h-6 mr-3 sm:h-9" alt="Landwind Logo">
+        <img style="height: 150px;"
+          src="data:image/png;base64,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"
+          class="h-6 mr-3 sm:h-9" alt="Landwind Logo">
       </a>
+      <div class="uppercase text-gray-800 dark:text-white font-black text-3xl">
+        MEDICART
+      </div>
       <div class="flex items-center lg:order-2">
-          <div class="hidden mt-2 mr-4 sm:inline-block">
-              <span></span>
-          </div>
+        <div class="hidden mt-2 mr-4 sm:inline-block">
+          <span></span>
+        </div>
 
-          <a href="https://themesberg.com/product/tailwind-css/landing-page"
-              class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-0 dark:bg-purple-600 dark:hover:bg-purple-700 focus:outline-none dark:focus:ring-purple-800">Download</a>
-          <button data-collapse-toggle="mobile-menu-2" type="button"
-      class="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-      aria-controls="mobile-menu-2" aria-expanded="true">
-      <span class="sr-only">Open main menu</span>
-      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd"
-          d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-          clip-rule="evenodd"></path>
-      </svg>
-      <svg class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd"
-          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-          clip-rule="evenodd"></path>
-      </svg>
-    </button>
+        <a href="{%url 'signout'%}"
+          class="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-0 dark:bg-purple-600 dark:hover:bg-purple-700 focus:outline-none dark:focus:ring-purple-800">LogOut</a>
+        <button data-collapse-toggle="mobile-menu-2" type="button"
+          class="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          aria-controls="mobile-menu-2" aria-expanded="true">
+          <span class="sr-only">Open main menu</span>
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <svg class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clip-rule="evenodd"></path>
+          </svg>
+        </button>
       </div>
       <div class="items-center justify-between w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
-          <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
-              <li>
-                  <a href="#"
-                      class="block py-2 pl-3 pr-4 text-white bg-purple-700 rounded lg:bg-transparent lg:text-purple-700 lg:p-0 dark:text-white"
-                      aria-current="page">Home</a>
-              </li>
-              <li>
-                  <a href="#"
-                      class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Company</a>
-              </li>
-              <li>
-                  <a href="#"
-                      class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Marketplace</a>
-              </li>
-              <li>
-                  <a href="#"
-                      class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Features</a>
-              </li>
-              <li>
-                  <a href="#"
-                      class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Team</a>
-              </li>
-              <li>
-                  <a href="#"
-                      class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Contact</a>
-              </li>
-          </ul>
+        <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
+          <li>
+            <a href="#"
+              class="block py-2 pl-3 pr-4 text-white bg-purple-700 rounded lg:bg-transparent lg:text-purple-700 lg:p-0 dark:text-white"
+              aria-current="page">Home</a>
+          </li>
+          <li>
+            <a href="{%url 'product-list'%}"
+              class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Home</a>
+          </li>
+          <li>
+            <a href="{%url 'cart-summary'%}"
+              class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Cart</a>
+          </li>
+          <li>
+            <a href="{%url 'order-summary'%}"
+              class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Orders</a>
+          </li>
+      
+        </ul>
       </div>
-  </div>
-</nav>
+    </div>
+  </nav>
 
-<script src="https://unpkg.com/flowbite@1.4.1/dist/flowbite.js"></script>
- {%block main_block%}
+  <script src="https://unpkg.com/flowbite@1.4.1/dist/flowbite.js"></script>
+  {%block main_block%}
 
- {%endblock%}
-    
+  {%endblock%}
+
+
+  <footer style="margin-top: 200px;" class="flex   mt-10 flex-col space-y-10 justify-center my-10">
+
+    <div class="flex justify-center space-x-5">
+      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.icons8.com/fluent/30/000000/facebook-new.png" />
+      </a>
+      <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.icons8.com/fluent/30/000000/linkedin-2.png" />
+      </a>
+      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.icons8.com/fluent/30/000000/instagram-new.png" />
+      </a>
+      <a href="https://messenger.com" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.icons8.com/fluent/30/000000/facebook-messenger--v2.png" />
+      </a>
+      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.icons8.com/fluent/30/000000/twitter.png" />
+      </a>
+    </div>
+    <p class="text-center text-gray-700 font-medium">&copy; 2025 Medicart Ltd. All rights reservered.</p>
+  </footer>
+
 </body>
+
 </html>

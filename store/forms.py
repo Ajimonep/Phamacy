@@ -1,6 +1,6 @@
 from django import forms
 
-from store.models import User,Order
+from store.models import User,Order,ReviewRating
 
 from django.contrib.auth.forms import UserCreationForm
 
@@ -38,3 +38,13 @@ class OrderForm(forms.ModelForm):
         model=Order
 
         fields=["address","phone","payment_method"]
+
+
+
+class ReviewForm(forms.ModelForm):
+
+    class Meta:
+
+        model = ReviewRating
+        
+        fields = ['subject', 'review', 'rating']

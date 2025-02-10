@@ -1,7 +1,7 @@
 {%extends 'base.html'%}
 
 {%block main_block%}
-<div class="bg-gray-100 dark:bg-gray-800 py-8">
+<div class="bg-white-100 dark:bg-gray-800 py-8">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row -mx-4">
             <div class="md:flex-1 px-4">
@@ -14,11 +14,9 @@
                     {%csrf_token%}
                 <div class="flex -mx-2 mb-4">
                     <div class="w-1/2 px-2">
-                        <button type="submit" class="w-full bg-gray-900 dark:bg-gray-600 text-white py-2 px-4 rounded-full font-bold hover:bg-gray-800 dark:hover:bg-gray-700">Add to Cart</button>
+                        <button type="submit" value="Add to Cart" class="w-full bg-gray-900 dark:bg-gray-600 text-white py-2 px-4 rounded-full font-bold hover:bg-gray-800 dark:hover:bg-gray-700">Add to Cart</button>
                     </div>
-                    <div class="w-1/2 px-2">
-                        <button class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 px-4 rounded-full font-bold hover:bg-gray-300 dark:hover:bg-gray-600">Add to Wishlist</button>
-                    </div>
+                   
                 </div>
             </div>
             <div class="md:flex-1 px-4">
@@ -71,8 +69,146 @@
             </div>
         </div>
     </div>
+
+
     
 
 </div>
 </form>
+
+
+
+<div class="container ">  
+     <div class="row ">
+    <div class="col ">
+        
+        <form action="{%url 'submit_review' product.id%}" method="post">
+            {%csrf_token%}
+                <h5>Write Your review</h5>
+                <div>
+                        <label>How do you rate this product</label>
+                        <br>
+                        <div class="rate">
+                            <input type="radio" name="rating" id="rating10" value="5" required /><label for="rating10" title="5"></label>
+                            <input type="radio" name="rating" id="rating9" value="4.5" required /><label for="rating9" title="4.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating8" value="4" required /><label for="rating8" title="4"></label>
+                            <input type="radio" name="rating" id="rating7" value="3.5" required /><label for="rating7" title="3.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating6" value="3" required /><label for="rating6" title="3"></label>
+                            <input type="radio" name="rating" id="rating5" value="2.5" required /><label for="rating5" title="2.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating4" value="2" required /><label for="rating4" title="2"></label>
+                            <input type="radio" name="rating" id="rating3" value="1.5" required /><label for="rating3" title="1.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating2" value="1" required /><label for="rating2" title="1"></label>
+                            <input type="radio" name="rating" id="rating1" value="0.5" required /><label for="rating1" title="0.5" class="half"></label>
+                        </div>
+                        <br>
+                    Review Title:
+                    <input type="text" class="form-control" name="subject">
+                    <br>
+                    Review:
+                    <textarea name="review" class="form-control" rows="4" id=""></textarea>
+                    {%if user.is_authenticated%}
+                    <input type="submit" value="submit review" class="btn btn-primary my-3">
+                    {%else%}
+                        <p>You must log in to post a review <span><a href="{% url 'login'%}"></a></span></p>
+                    {%endif%}
+                </div>
+
+                {{form}}
+        </form>
+        <header class="section-heading">
+          <h3>Customer Review</h3>
+          {% for review in reviews %}
+				<article class="box mb-3 shadow my-2">
+					<div class="icontext w-100">
+
+						<div class="text">
+							<h6 class="mb-1">{{review.user}} </h6>
+							<div class="rating-star">
+								<span>
+									<i class="fa fa-star{% if review.rating == 0.5 %}-half-o{% elif review.rating < 1 %}-o {% endif %}" aria-hidden="true"></i>
+									<i class="fa fa-star{% if review.rating == 1.5 %}-half-o{% elif review.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
+									<i class="fa fa-star{% if review.rating == 2.5 %}-half-o{% elif review.rating < 3 %}-o {% endif %}" aria-hidden="true"></i>
+									<i class="fa fa-star{% if review.rating == 3.5 %}-half-o{% elif review.rating < 4 %}-o {% endif %}" aria-hidden="true"></i>
+									<i class="fa fa-star{% if review.rating == 4.5 %}-half-o{% elif review.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
+								</span>
+                <span class="date text-muted text-sm float-md-right">{{review.updated_at}} </span>
+
+							</div>
+						</div>
+					</div> <!-- icontext.// -->
+					<div class="mt-3">
+						<h6>{{review.subject}}</h6>
+						<p>
+							{{review.review}}
+						</p>
+					</div>
+				</article>
+{% endfor %}
+      </header>
+    </div>
+</div></div>
+
+<style>
+    /* Hide Radio button */
+.rate > input{
+  display: none;
+}
+
+.rate{
+  display: inline-block;;
+  border: 0;
+}
+
+.rate > label{
+  float: right;
+}
+
+/* Showing the stars */
+.rate > label:before{
+  display: inline-block;
+  font-size: 1.1rem;
+  font-family: FontAwesome;
+  content: "\f005";
+  margin:0;
+  padding:0.3rem .2rem;
+  cursor: pointer;
+}
+
+/* Half star */
+.rate .half:before{
+  content: "\f089";
+  position: absolute;
+  padding-right: 0;
+}
+
+/* Click and hover */
+input:checked ~ label, label:hover ~ label{
+  color: #ffb503;
+}
+
+/* hover hightlight */
+input:checked + label:hover, input:checked ~ label:hover,input:checked ~ label:hover ~ label,
+label:hover ~ input:checked ~ label{
+  color: #cc9000;
+}
+
+.rating-star i{
+  color: #ffb503 !important;
+}
+
+ul.thumb{
+  margin:0 auto;
+  padding: 0;
+  float: left;
+}
+ul.thumb li{
+  list-style: none;
+  margin: 10px;
+}
+ul.thumb li img{
+  width: 80px;
+  height: 80px;
+  border: 1px solid grey;
+}
+</style>
 {%endblock%}

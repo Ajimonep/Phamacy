@@ -1,8 +1,8 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 
 from django.views.generic import View
 
-from store.forms import SignUpForm,LoginForm,OrderForm
+from store.forms import SignUpForm,LoginForm,OrderForm,ReviewForm
 
 from django.core.mail import send_mail
 
@@ -10,9 +10,9 @@ from store.models import User,Size,BasketItem,OrderItem,Order
 
 from django.contrib import messages
 
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate,login,logout
 
-from store.models import Product
+from store.models import Product,ReviewRating
 
 from django.core.paginator import Paginator
 
@@ -22,9 +22,19 @@ from django.utils.decorators import method_decorator
 
 from decouple import config
 
+from django.template.loader import render_to_string
+
+from django.http import HttpResponse
+
+from store.decorators import signin_required
+
+from django.views.decorators.cache import never_cache
+
 RZP_KEY_ID=config('RZP_KEY_ID')
 
 RZP_KEY_SECRET=config('RZP_KEY_SECRET')
+
+decs=[signin_required,never_cache]
 
 
 def send_otp_email(user):
@@ -140,6 +150,15 @@ class SignInView(View):
 
         return render(request,self.template_name,{"form":form_instance})
 
+class SignOutView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        logout(request)
+
+        return redirect("signin")
+
+@method_decorator(decs,name="dispatch")
 class ProductListView(View):
 
     template_name="index.html"
@@ -158,6 +177,7 @@ class ProductListView(View):
 
         return render(request,self.template_name,{"page_obj":page_obj,"data":qs})
 
+@method_decorator(decs,name="dispatch")
 class productDetailView(View):
 
     template_name="product_detail.html"
@@ -168,8 +188,11 @@ class productDetailView(View):
 
         qs=Product.objects.get(id=id)
 
-        return render(request,self.template_name,{"product":qs})
+        reviews=ReviewRating.objects.filter(product=qs)
 
+        return render(request,self.template_name,{"product":qs,"reviews":reviews})
+
+@method_decorator(decs,name="dispatch")
 class AddToCartView(View):
 
     def post(self,request,*args,**kwargs):
@@ -202,7 +225,7 @@ class AddToCartView(View):
 
         return redirect("cart-summary")
 
-
+@method_decorator(decs,name="dispatch")
 class CartSummaryView(View):
 
     template_name="cart_summary.html"
@@ -217,7 +240,7 @@ class CartSummaryView(View):
 
         return render(request,self.template_name,{"basket_items":qs,"basket_total":basket_total,"basket_item_count":basket_item_count})
     
-
+@method_decorator(decs,name="dispatch")
 class ItemDeleteView(View):
 
     def get(self,request,*args,**kwargs):
@@ -231,6 +254,7 @@ class ItemDeleteView(View):
 
 import razorpay
 
+@method_decorator(decs,name="dispatch")
 class PlaceOrderView(View):
 
     form_class=OrderForm
@@ -311,7 +335,7 @@ class PlaceOrderView(View):
 
         return redirect("product-list")
 
-
+@method_decorator(decs,name="dispatch")
 class OrderSummaryView(View):
 
     template_name="order_summary.html"
@@ -355,37 +379,13 @@ class PaymentVerificationView(View):
 
 
 
-class OrderStatusView(View):
-
-    template_name = "order_status.html"
-
-    def get(self, request, *args, **kwargs):
-
-        order_id = kwargs.get('order_id')
-
-        try:
-            order = Order.objects.get(id=order_id, customer=request.user)
-
-            context = {
-
-                'order': order,
-                'order_item':order.products,
-                'order_status': order.status,
-                'total_amount': order.amount,
-            }
-            return render(request, self.template_name, context)
-        
-        except Order.DoesNotExist:
-
-            return render(request)
-        
 
 
+@method_decorator(decs,name="dispatch")
 class InvoiceDownloadView(View):
 
     def get(self, request, order_id, *args, **kwargs):
 
-        try:
             order = Order.objects.get(id=order_id, customer=request.user)
 
             html_invoice = render_to_string('invoice.html', {'order': order, 'order_items':  order.orderitems.all()})
@@ -396,6 +396,47 @@ class InvoiceDownloadView(View):
 
             return response
         
-        except Order.DoesNotExist:
 
-            return HttpResponse("Order not found", status=404)
+@method_decorator(decs,name="dispatch")
+class SubmitReviewView(View):
+
+    form_class=ReviewForm
+
+    template_name="product_detail.html"
+
+    def get(self,request,*args,**kwargs):
+
+        form_instance=self.form_class
+
+       
+        return render(request,self.template_name,{"form":form_instance})
+
+    def post(self,request,*args,**kwargs):
+
+        form_data=request.POST
+
+        form_instance=self.form_class(form_data)
+
+        if form_instance.is_valid():
+
+            data=form_instance.cleaned_data
+
+            product = get_object_or_404(Product, pk=kwargs.get("pk"))
+
+            review = form_instance.save(commit=False)
+
+            review.product = product
+
+            review.user = request.user
+
+            review.save()
+
+            return redirect("product-detail",pk=product.pk)
+
+            messages.success(request,"review added sucessfully")
+
+
+        messages.error(request,"review not added ")
+
+        return render(request,self.template_name,{"form":form_instance})
+
