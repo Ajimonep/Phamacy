@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from random import randint
 from django.db.models.signals import post_save
-
+from django.core.exceptions import ValidationError
 class User(AbstractUser):
 
     is_verified=models.BooleanField(default=False)
@@ -55,7 +55,6 @@ class Product(BaseModel):
 
     medicinetype_object=models.ForeignKey(MedicineType,on_delete=models.CASCADE)
 
-
     size_objects=models.ManyToManyField(Size,related_name="sizes")
     
     manufacture=models.CharField(max_length=100)
@@ -80,7 +79,6 @@ class BasketItem(BaseModel):
 
     size_object=models.ForeignKey(Size,on_delete=models.CASCADE,null=True)
 
-
     is_order_placed=models.BooleanField(default=False)
 
     basket_object=models.ForeignKey(Basket,on_delete=models.CASCADE,related_name="cart_item")
@@ -89,6 +87,14 @@ class BasketItem(BaseModel):
     def item_total(self):
 
         return self.product_object.price*self.quantity
+
+    def clean(self):
+        if self.quantity > 11:
+            raise ValidationError('Quantity cannot exceed 11.')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 class Order(BaseModel):

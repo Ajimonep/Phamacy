@@ -95,16 +95,33 @@
       </header> -->
   <!-- nav bar end -->
 
+  <div class="container mx-auto mt-4">
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="w-50 mx-auto mt-3">
+      
+          <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+            <strong>{{message}}</strong> 
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+
   <nav class="bg-white border-gray-200 py-2.5 dark:bg-gray-900">
     <div class="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
-      <a href="#" class="flex items-center">
+      <a href="{%url 'product-list'%}" class="flex items-center">
         <img style="height: 150px;"
           src="data:image/png;base64,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"
           class="h-6 mr-3 sm:h-9" alt="Landwind Logo">
       </a>
-      <div class="uppercase text-gray-800 dark:text-white font-black text-3xl">
+      <a href="{%url 'product-list'%}" class="uppercase text-gray-800 dark:text-white font-black text-3xl">
         MEDICART
-      </div>
+      </a>
       <div class="flex items-center lg:order-2">
         <div class="hidden mt-2 mr-4 sm:inline-block">
           <span></span>
@@ -147,6 +164,10 @@
             <a href="{%url 'order-summary'%}"
               class="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Orders</a>
           </li>
+          <li> <form class="d-flex" method="get" action="{% url 'product-list' %}">
+            <input class="form-control me-2" type="text" name="filter" placeholder="Search..." value="{{ request.GET.filter }}">
+            <button class="btn btn-outline-dark rounded" type="submit">Search</button>
+        </form></li>
       
         </ul>
       </div>
@@ -182,5 +203,14 @@
   </footer>
 
 </body>
+
+<script>
+  setTimeout(function() {
+      var messages = document.querySelectorAll('.alert');
+      messages.forEach(function(message) {
+          message.style.display = 'none';
+      });
+  }, 2000);
+</script>
 
 </html>

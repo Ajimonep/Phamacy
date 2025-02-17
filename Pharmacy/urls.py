@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from store import views
+from store.views import UpdateQuantityView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -36,6 +37,7 @@ urlpatterns = [
     path('payment/verify/',views.PaymentVerificationView.as_view(),name="payment-verify"),
     path('download invoice/<int:order_id>/',views.InvoiceDownloadView.as_view(), name='download-invoice'),
     path('submit-review/<int:pk>/',views.SubmitReviewView.as_view(),name='submit_review'),
+    path('update-quantity/<int:item_id>/', UpdateQuantityView.as_view(), name='update-quantity'),
 
 
 

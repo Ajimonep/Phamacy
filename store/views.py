@@ -6,7 +6,9 @@ from store.forms import SignUpForm,LoginForm,OrderForm,ReviewForm
 
 from django.core.mail import send_mail
 
-from store.models import User,Size,BasketItem,OrderItem,Order
+from store.models import User,Size,BasketItem,OrderItem,Order,MedicineType
+
+from django.db.models import Q
 
 from django.contrib import messages
 
@@ -29,6 +31,8 @@ from django.http import HttpResponse
 from store.decorators import signin_required
 
 from django.views.decorators.cache import never_cache
+
+from django.core.exceptions import ValidationError
 
 RZP_KEY_ID=config('RZP_KEY_ID')
 
@@ -163,19 +167,31 @@ class ProductListView(View):
 
     template_name="index.html"
 
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
 
-        qs=Product.objects.all()
+        search_text = request.GET.get("filter", "")
 
-        paginator=Paginator(qs,9)
+        qs = Product.objects.all()
+        
 
-        page_number=request.GET.get("page")
+        if search_text:
+            qs = qs.filter(Q(title__icontains=search_text) |Q(medicinetype_object__MedicineType__icontains=search_text) |Q(manufacture__icontains=search_text)
+            )
+            messages.success(request, "Product list fetched successfully")
 
-        page_obj=paginator.get_page(page_number)
+        paginator = Paginator(qs, 9)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
 
-        print(qs)
+        all_medicine_type = MedicineType.objects.values_list("MedicineType", flat=True).distinct()
 
-        return render(request,self.template_name,{"page_obj":page_obj,"data":qs})
+        all_medicine = Product.objects.values_list("title", flat=True).distinct()
+        
+        all_manufacturer = Product.objects.values_list("manufacture", flat=True).distinct()
+
+        all_records = list(all_medicine_type) + list(all_medicine) + list(all_manufacturer)
+
+        return render(request, self.template_name, {"page_obj": page_obj, "data": qs, "records": all_records})
 
 @method_decorator(decs,name="dispatch")
 class productDetailView(View):
@@ -192,53 +208,140 @@ class productDetailView(View):
 
         return render(request,self.template_name,{"product":qs,"reviews":reviews})
 
-@method_decorator(decs,name="dispatch")
+
+
+
+
+@method_decorator(decs, name="dispatch")
 class AddToCartView(View):
 
-    def post(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
 
-        id=kwargs.get("pk")
+        product_id = kwargs.get('pk')
 
-        quantity=request.POST.get("quantity")
+        quantity = int(request.POST.get('quantity', 1))
 
-        product_object=Product.objects.get(id=id)
+        size_id = request.POST.get('size_id')
 
-        size=request.POST.get("size")
+        product = get_object_or_404(Product, id=product_id)
 
-        size_object=Size.objects.get(name=size)
+        basket = request.user.cart  
 
+        try:
+            basket_item = BasketItem.objects.get(
+                product_object=product,
 
-        # unit=product_object.unit
+                size_object_id=size_id,
 
-        basket_object=request.user.cart
+                basket_object=basket,
 
-        BasketItem.objects.create(
-            product_object=product_object,
-            quantity=quantity,
-            size_object=size_object,
+                is_order_placed=False
+            )
+            basket_item.quantity += quantity
 
+            basket_item.clean()
+
+            basket_item.save()
+
+        except BasketItem.DoesNotExist:
+
+            basket_item = BasketItem(
+                product_object=product,
+                quantity=quantity,
+                size_object_id=size_id,
+                basket_object=basket
+            )
             
-            basket_object=basket_object
-        )
+            try:
+                basket_item.clean()  
 
-        print("item has been added to cart")
+                basket_item.save()
 
-        return redirect("cart-summary")
+            except ValidationError as e:
+
+                messages.error(request, e.message)
+
+                return redirect('product-detail', pk=product_id)
+
+        except ValidationError as e:
+
+            messages.error(request, e.message)
+
+            return redirect('product-detail', pk=product_id)
+
+        current_total = sum(item.item_total for item in basket.cart_item.all())
+
+        new_item_total = product.price * quantity
+
+        new_total = current_total + new_item_total
+
+        if new_total > 5000:
+
+            return redirect('cart-summary')
+
+        return redirect('cart-summary')
+
+@method_decorator(csrf_exempt, name='dispatch')  
+class UpdateQuantityView(View):
+    def post(self, request, item_id, *args, **kwargs):  # Accept item_id from URL
+        try:
+            new_quantity = request.POST.get("quantity")  # Get quantity from form data
+            if new_quantity:
+                basket_item = BasketItem.objects.get(id=item_id)
+                basket_item.quantity = int(new_quantity)
+                basket_item.save()
+
+        except BasketItem.DoesNotExist:
+            pass  
+
+        return redirect('cart-summary')
 
 @method_decorator(decs,name="dispatch")
 class CartSummaryView(View):
+    template_name = "cart_summary.html"
 
-    template_name="cart_summary.html"
+    def get(self, request, *args, **kwargs):
+        qs = BasketItem.objects.filter(basket_object=request.user.cart, is_order_placed=False)
+        basket_item_count = qs.count()
+        basket_total = sum([bi.item_total for bi in qs])
+        return render(request, self.template_name, {"basket_items": qs, "basket_total": basket_total, "basket_item_count": basket_item_count})
 
-    def get(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
+        item_id = request.POST.get('item_id')
+        new_quantity = int(request.POST.get('quantity', 1))
 
-        qs=BasketItem.objects.filter(basket_object=request.user.cart,is_order_placed=False)
+        basket_item = get_object_or_404(BasketItem, id=item_id, basket_object=request.user.cart, is_order_placed=False)
 
-        basket_item_count=qs.count()
+        if new_quantity > 11:
+            messages.error(request, "Quantity cannot exceed 11.")
+            return redirect('cart-summary')
 
-        basket_total=sum([bi.item_total for bi in qs])
+        basket_item.quantity = new_quantity
 
-        return render(request,self.template_name,{"basket_items":qs,"basket_total":basket_total,"basket_item_count":basket_item_count})
+        try:
+            basket_item.clean()
+            basket_item.save()
+            messages.success(request, "Item quantity updated successfully.")
+        except ValidationError as e:
+            messages.error(request, e.message)
+
+        return redirect('cart-summary')
+
+
+
+# class CartSummaryView(View):
+
+#     template_name="cart_summary.html"
+
+#     def get(self,request,*args,**kwargs):
+
+#         qs=BasketItem.objects.filter(basket_object=request.user.cart,is_order_placed=False)
+
+#         basket_item_count=qs.count()
+
+#         basket_total=sum([bi.item_total for bi in qs])
+
+#         return render(request,self.template_name,{"basket_items":qs,"basket_total":basket_total,"basket_item_count":basket_item_count})
     
 @method_decorator(decs,name="dispatch")
 class ItemDeleteView(View):
@@ -373,7 +476,6 @@ class PaymentVerificationView(View):
 
         
 
-        print(request.POST)
 
         return redirect("order-summary")
 
@@ -397,31 +499,49 @@ class InvoiceDownloadView(View):
             return response
         
 
-@method_decorator(decs,name="dispatch")
+
+@method_decorator(decs, name="dispatch")
 class SubmitReviewView(View):
 
-    form_class=ReviewForm
+    form_class = ReviewForm
 
-    template_name="product_detail.html"
+    template_name = "product_detail.html"
 
-    def get(self,request,*args,**kwargs):
+    def get(self, request, *args, **kwargs):
 
-        form_instance=self.form_class
+        form_instance = self.form_class()
 
-       
-        return render(request,self.template_name,{"form":form_instance})
+        return render(request, self.template_name, {"form": form_instance})
 
-    def post(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
 
-        form_data=request.POST
+        form_data = request.POST
 
-        form_instance=self.form_class(form_data)
+        form_instance = self.form_class(form_data)
+
+        product = get_object_or_404(Product, pk=kwargs.get("pk"))
+
+        has_purchased = OrderItem.objects.filter(
+            order_object__customer=request.user,
+            product_object=product
+        ).exists()
+
+        if not has_purchased:
+            messages.error(request, "You can only review products you have purchased.")
+
+            return redirect("product-detail", pk=product.pk)
+
+        has_reviewed = ReviewRating.objects.filter(
+            product=product,
+            user=request.user
+        ).exists()
+
+        if has_reviewed:
+            messages.error(request, "You have already reviewed this product.")
+
+            return redirect("product-detail", pk=product.pk)
 
         if form_instance.is_valid():
-
-            data=form_instance.cleaned_data
-
-            product = get_object_or_404(Product, pk=kwargs.get("pk"))
 
             review = form_instance.save(commit=False)
 
@@ -431,12 +551,10 @@ class SubmitReviewView(View):
 
             review.save()
 
-            return redirect("product-detail",pk=product.pk)
+            messages.success(request, "Review added successfully.")
 
-            messages.success(request,"review added sucessfully")
+            return redirect("product-detail", pk=product.pk)
 
+        messages.error(request, "Review not added.")
 
-        messages.error(request,"review not added ")
-
-        return render(request,self.template_name,{"form":form_instance})
-
+        return render(request, self.template_name, {"form": form_instance})
